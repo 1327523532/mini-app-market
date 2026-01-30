@@ -1,0 +1,64 @@
+{
+  "applications": [
+    {
+      "id": "app001",
+      "name": "🔢 计数器",
+      "description": "一个简单实用的计数器，支持加减和重置",
+      "type": "tool",
+      "tags": ["工具", "简单", "实用"],
+      "code": "<div style='text-align:center;padding:40px;font-family:sans-serif'><h2>计数器</h2><div id='count' style='font-size:60px;font-weight:bold;margin:30px 0;color:#667eea'>0</div><div style='display:flex;gap:10px;justify-content:center'><button onclick='count--;update()' style='padding:15px 30px;font-size:18px;border:none;background:#ff6b6b;color:#fff;border-radius:10px;cursor:pointer'>-</button><button onclick='count=0;update()' style='padding:15px 25px;font-size:16px;border:none;background:#95a5a6;color:#fff;border-radius:10px;cursor:pointer'>重置</button><button onclick='count++;update()' style='padding:15px 30px;font-size:18px;border:none;background:#00b894;color:#fff;border-radius:10px;cursor:pointer'>+</button></div></div><script>let count=0;function update(){document.getElementById('count').textContent=count}</script>",
+      "authorId": "demo",
+      "authorName": "Demo",
+      "views": 156,
+      "createdAt": "2026-01-30T00:00:00Z"
+    },
+    {
+      "id": "app002",
+      "name": "🎲 随机抽签",
+      "description": "随机抽取幸运数字或幸运签",
+      "type": "tool",
+      "tags": ["娱乐", "随机", "有趣"],
+      "code": "<div style='text-align:center;padding:40px;font-family:sans-serif'><h2>🎲 随机抽签</h2><div id='result' style='font-size:48px;margin:30px 0;min-height:60px'>点击下方按钮开始</div><button onclick='抽签()' style='padding:15px 40px;font-size:18px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:25px;cursor:pointer'>开始抽签</button><div style='margin-top:20px;font-size:14px;color:#666'>已抽取 <span id='times'>0</span> 次</div></div><script>let times=0;const signs=['大吉','中吉','小吉','吉','末吉','凶'];function 抽签(){times++;document.getElementById('times').textContent=times;const sign=signs[Math.floor(Math.random()*signs.length)];document.getElementById('result').textContent=sign+' ✨'}</script>",
+      "authorId": "demo",
+      "authorName": "Demo",
+      "views": 234,
+      "createdAt": "2026-01-30T00:05:00Z"
+    },
+    {
+      "id": "app003",
+      "name": "🎨 颜色转换器",
+      "description": "HEX颜色与RGB颜色互转工具",
+      "type": "utility",
+      "tags": ["工具", "设计", "颜色"],
+      "code": "<div style='max-width:500px;margin:30px auto;padding:30px;font-family:sans-serif;background:#fff;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1)'><h2 style='text-align:center;margin-bottom:30px'>🎨 颜色转换器</h2><div style='margin-bottom:25px'><label style='display:block;margin-bottom:10px;font-weight:bold'>HEX颜色</label><div style='display:flex;gap:10px'><input type='text' id='hex' value='#667eea' oninput='hexToRgb()' style='flex:1;padding:12px;border:2px solid #eee;border-radius:10px;font-size:16px'><input type='color' id='hexColor' value='#667eea' oninput='updateFromColor()' style='width:50px;height:48px;border:none;cursor:pointer'></div></div><div id='colorPreview' style='height:60px;border-radius:10px;background:#667eea;margin-bottom:25px'></div><div style='margin-bottom:25px'><label style='display:block;margin-bottom:10px;font-weight:bold'>RGB颜色</label><div style='display:flex;gap:10px'><input type='text' id='rgb' readonly style='flex:1;padding:12px;border:2px solid #eee;border-radius:10px;font-size:16px;background:#f8f9fa'></div></div><div style='text-align:center'><button onclick='copyRgb()' style='padding:12px 30px;border:none;background:#00b894;color:#fff;border-radius:10px;cursor:pointer;font-size:16px'>复制RGB</button></div></div><script>function hexToRgb(){const hex=document.getElementById('hex').value.replace('#','');if(hex.length===6){const r=parseInt(hex.substr(0,2),16),g=parseInt(hex.substr(2,2),16),b=parseInt(hex.substr(4,2),16);document.getElementById('rgb').value='rgb('+r+', '+g+', '+b+')';document.getElementById('colorPreview').style.background=hex;document.getElementById('hexColor').value='#'+hex}}function updateFromColor(){const color=document.getElementById('hexColor').value;document.getElementById('hex').value=color;hexToRgb()}function copyRgb(){navigator.clipboard.writeText(document.getElementById('rgb').value);alert('已复制RGB值！')}hexToRgb()</script>",
+      "authorId": "demo",
+      "authorName": "Demo",
+      "views": 89,
+      "createdAt": "2026-01-30T00:10:00Z"
+    },
+    {
+      "id": "app004",
+      "name": "⏱️ 倒计时器",
+      "description": "简单好用的倒计时工具",
+      "type": "tool",
+      "tags": ["工具", "时间", "实用"],
+      "code": "<div style='text-align:center;padding:40px;font-family:sans-serif'><h2>⏱️ 倒计时器</h2><div id='display' style='font-size:72px;font-weight:bold;margin:20px 0;font-family:monospace;color:#667eea'>05:00</div><div style='display:flex;gap:10px;justify-content:center;flex-wrap:wrap'><input type='number' id='minutes' value='5' min='1' max='60' style='width:80px;padding:10px;border:2px solid #eee;border-radius:10px;text-align:center;font-size:16px'>分钟<button onclick='startCountdown()' style='padding:12px 25px;border:none;background:#00b894;color:#fff;border-radius:10px;cursor:pointer;font-size:16px'>开始</button><button onclick='resetCountdown()' style='padding:12px 25px;border:none;background:#ff6b6b;color:#fff;border-radius:10px;cursor:pointer;font-size:16px'>重置</button></div></div><script>let timer=null;let totalSeconds=0;function startCountdown(){if(timer)clearInterval(timer);totalSeconds=parseInt(document.getElementById('minutes').value)*60;updateDisplay();timer=setInterval(function(){totalSeconds--;updateDisplay();if(totalSeconds<=0){clearInterval(timer);alert('时间到！⏰')}},1000)}function resetCountdown(){if(timer)clearInterval(timer);totalSeconds=parseInt(document.getElementById('minutes').value)*60;updateDisplay()}function updateDisplay(){const m=Math.floor(totalSeconds/60),s=totalSeconds%60;document.getElementById('display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}</script>",
+      "authorId": "demo",
+      "authorName": "Demo",
+      "views": 145,
+      "createdAt": "2026-01-30T00:15:00Z"
+    },
+    {
+      "id": "app005",
+      "name": "💱 汇率计算器",
+      "description": "实时汇率换算工具",
+      "type": "utility",
+      "tags": ["工具", "汇率", "金融"],
+      "code": "<div style='max-width:500px;margin:30px auto;padding:30px;font-family:sans-serif;background:#fff;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1)'><h2 style='text-align:center;margin-bottom:30px'>💱 汇率计算器</h2><div style='display:grid;grid-template-columns:1fr auto 1fr;gap:15px;align-items:end;margin-bottom:20px'><div><label style='display:block;margin-bottom:8px;font-weight:bold'>金额</label><input type='number' id='amount' value='100' oninput='calculate()' style='width:100%;padding:12px;border:2px solid #eee;border-radius:10px;font-size:16px'></div><div style='font-size:24px'>→</div><div><label style='display:block;margin-bottom:8px;font-weight:bold'>人民币 (CNY)</label><input type='text' id='result' readonly style='width:100%;padding:12px;border:2px solid #667eea;border-radius:10px;font-size:16px;background:#f0f4ff'></div></div><div style='background:#f8f9fa;padding:15px;border-radius:10px;font-size:14px;color:#666'><strong>参考汇率：</strong>1 USD ≈ 7.2 CNY</div></div><script>const rates={USD:7.2,EUR:7.8,GBP:9.1,JPY:0.048,KRW:0.0054};function calculate(){const amount=parseFloat(document.getElementById('amount').value)||0;const cny=amount*rates.USD;document.getElementById('result').value='¥'+cny.toFixed(2);document.getElementById('result').style.background=amount>0?'#f0f4ff':'#ffe6e6'}calculate()</script>",
+      "authorId": "demo",
+      "authorName": "Demo",
+      "views": 178,
+      "createdAt": "2026-01-30T00:20:00Z"
+    }
+  ]
+}

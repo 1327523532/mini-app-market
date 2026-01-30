@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录/注册 - Mini-Application</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-container {
+            max-width: 420px;
+            margin: 60px auto;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+        }
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .auth-tab.active {
+            opacity: 1;
+            border-bottom-color: #667eea;
+        }
+        .auth-form {
+            display: none;
+        }
+        .auth-form.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 1em;
+        }
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(102,126,234,0.3);
+        }
+        .auth-submit {
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+            opacity: 0.7;
+        }
+        .auth-switch a {
+            color: #667eea;
+            cursor: pointer;
+        }
+        .error-message {
+            background: rgba(255,107,107,0.2);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .success-message {
+            background: rgba(0,184,148,0.2);
+            border: 1px solid #00b894;
+            color: #00b894;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .user-info {
+            text-align: center;
+            padding: 40px;
+        }
+        .user-info .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+        }
+        .user-info .username {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        .user-info .email {
+            opacity: 0.7;
+            margin-bottom: 30px;
+        }
+        .auth-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="back-link">← 返回首页</a>
+            <h1>🚀 Mini-Application</h1>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="auth-container" id="authContainer">
+            <!-- 未登录状态 -->
+            <div id="authForms">
+                <div class="auth-tabs">
+                    <div class="auth-tab active" data-tab="login" onclick="switchTab('login')">登录</div>
+                    <div class="auth-tab" data-tab="register" onclick="switchTab('register')">注册</div>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+
+                <!-- 登录表单 -->
+                <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>邮箱</label>
+                        <input type="email" id="loginEmail" required placeholder="输入邮箱">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="loginPassword" required placeholder="输入密码">
+                    </div>
+                    <button type="submit" class="btn btn-primary auth-submit">登录</button>
+                    <div class="auth-switch">
+                        还没有账号？<a onclick="switchTab('register')">立即注册</a>
+                    </div>
+                </form>
+
+                <!-- 注册表单 -->
+                <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" id="regUsername" required placeholder="设置用户名" minlength="2" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label>邮箱</label>
+                        <input type="email" id="regEmail" required placeholder="输入邮箱">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="regPassword" required placeholder="设置密码" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>确认密码</label>
+                        <input type="password" id="regPassword2" required placeholder="再次输入密码">
+                    </div>
+                    <button type="submit" class="btn btn-primary auth-submit">注册</button>
+                    <div class="auth-switch">
+                        已有账号？<a onclick="switchTab('login')">立即登录</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 已登录状态 -->
+            <div id="userInfo" style="display: none;">
+                <div class="user-info">
+                    <img class="avatar" id="userAvatar" src="" alt="头像">
+                    <div class="username" id="userUsername"></div>
+                    <div class="email" id="userEmail"></div>
+                    <div class="auth-links">
+                        <a href="profile.html" class="btn btn-primary">个人主页</a>
+                        <button class="btn btn-secondary" onclick="handleLogout()">退出登录</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>🚀 Mini-Application 微应用市场</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+        });
+
+        // 检查登录状态
+        function checkAuth() {
+            const user = userStorage.getCurrentUser();
+            if (user) {
+                showUserInfo(user);
+            } else {
+                showAuthForms();
+            }
+        }
+
+        // 切换标签
+        function switchTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === tab);
+            });
+            document.querySelectorAll('.auth-form').forEach(f => {
+                f.classList.toggle('active', f.id === tab + 'Form');
+            });
+            hideMessages();
+        }
+
+        // 显示错误
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        // 显示成功
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        // 隐藏消息
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // 处理登录
+        async function handleLogin(e) {
+            e.preventDefault();
+            hideMessages();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const result = userStorage.login(email, password);
+            
+            if (result.success) {
+                showSuccess('登录成功！');
+                setTimeout(() => {
+                    window.location.href = 'profile.html';
+                }, 1000);
+            } else {
+                showError(result.message);
+            }
+        }
+
+        // 处理注册
+        async function handleRegister(e) {
+            e.preventDefault();
+            hideMessages();
+            
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const password2 = document.getElementById('regPassword2').value;
+            
+            // 验证密码
+            if (password !== password2) {
+                showError('两次输入的密码不一致');
+                return;
+            }
+            
+            const result = userStorage.register(username, email, password);
+            
+            if (result.success) {
+                showSuccess('注册成功！');
+                setTimeout(() => {
+                    window.location.href = 'profile.html';
+                }, 1000);
+            } else {
+                showError(result.message);
+            }
+        }
+
+        // 退出登录
+        function handleLogout() {
+            userStorage.logout();
+            window.location.reload();
+        }
+
+        // 显示用户信息
+        function showUserInfo(user) {
+            document.getElementById('authForms').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('userAvatar').src = user.avatar;
+            document.getElementById('userUsername').textContent = user.username;
+            document.getElementById('userEmail').textContent = user.email;
+        }
+
+        // 显示登录表单
+        function showAuthForms() {
+            document.getElementById('authForms').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

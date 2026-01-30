@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💬 需求广场 - Mini-Application</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .demand-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        .demand-card:hover {
+            transform: translateY(-3px);
+            border-color: #00b894;
+        }
+        .demand-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .demand-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .demand-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+        .status-open { background: linear-gradient(135deg, #00b894, #00cec9); }
+        .status-progress { background: linear-gradient(135deg, #fdcb6e, #e17055); }
+        .status-completed { background: linear-gradient(135deg, #6c5ce7, #a29bfe); }
+        
+        .demand-desc {
+            opacity: 0.8;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .demand-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+            opacity: 0.6;
+        }
+        .demand-actions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .budget {
+            color: #fdcb6e;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="back-link">← 返回市场</a>
+            <h1>💬 需求广场</h1>
+            <p class="tagline">发布需求，对接服务，解决问题</p>
+        </div>
+        <button class="btn btn-primary" onclick="showPublishModal()">➕ 发布需求</button>
+    </header>
+
+    <main class="main">
+        <section class="filters">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="open">🟢 进行中</button>
+            <button class="filter-btn" data-filter="in-progress">🟡 已完成</button>
+            <button class="filter-btn" data-filter="completed">🟢 开放中</button>
+        </section>
+
+        <section class="demands-list" id="demandsList">
+            <p class="empty-state">📭 暂无需求，成为第一个发布者！</p>
+        </section>
+    </main>
+
+    <!-- 发布需求弹窗 -->
+    <div class="modal" id="publishModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closePublishModal()">&times;</span>
+            <h2>➕ 发布需求</h2>
+            <form id="publishForm">
+                <div class="form-group">
+                    <label>需求标题 *</label>
+                    <input type="text" id="demandTitle" required placeholder="简要描述你的需求" maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label>详细描述 *</label>
+                    <textarea id="demandDesc" required placeholder="详细描述你的需求，包括功能要求、预算等" rows="5"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>预算范围</label>
+                    <input type="text" id="demandBudget" placeholder="如：¥500-1000 或 面议">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closePublishModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">发布需求</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>💬 需求广场 | 让需求被精准对接</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        let demands = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDemands();
+            initFilters();
+            initPublishForm();
+        });
+
+        async function loadDemands() {
+            try {
+                const response = await fetch('demands.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    demands = data.demands || [];
+                }
+            } catch (e) {}
+            renderDemands();
+        }
+
+        function renderDemands(filter = 'all') {
+            const list = document.getElementById('demandsList');
+            
+            if (demands.length === 0) {
+                list.innerHTML = '<p class="empty-state">📭 暂无需求，成为第一个发布者！</p>';
+                return;
+            }
+
+            const filtered = filter === 'all' ? demands : demands.filter(d => d.status === filter);
+            
+            list.innerHTML = filtered.map(demand => `
+                <div class="demand-card" data-status="${demand.status}">
+                    <div class="demand-header">
+                        <div class="demand-title">${escapeHtml(demand.title)}</div>
+                        <span class="demand-status ${getStatusClass(demand.status)}">${getStatusText(demand.status)}</span>
+                    </div>
+                    <div class="demand-desc">${escapeHtml(demand.description)}</div>
+                    <div class="demand-meta">
+                        <span>👤 ${escapeHtml(demand.author || '匿名')}</span>
+                        <span>📅 ${formatDate(demand.createdAt)}</span>
+                        ${demand.budget ? `<span class="budget">💰 ${escapeHtml(demand.budget)}</span>` : ''}
+                    </div>
+                    <div class="demand-actions">
+                        <button class="btn-small btn-open" onclick="contactDemand('${demand.id}')">📞 联系</button>
+                        <button class="btn-small btn-edit" onclick="editDemand('${demand.id}')">✏️ 编辑</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusClass(status) {
+            const classes = {
+                'open': 'status-open',
+                'in-progress': 'status-progress',
+                'completed': 'status-completed'
+            };
+            return classes[status] || 'status-open';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                'open': '🟢 开放中',
+                'in-progress': '🟡 进行中',
+                'completed': '🔵 已完成'
+            };
+            return texts[status] || '🟢 开放中';
+        }
+
+        function initFilters() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderDemands(btn.dataset.filter);
+                });
+            });
+        }
+
+        function showPublishModal() {
+            document.getElementById('publishModal').classList.add('active');
+        }
+
+        function closePublishModal() {
+            document.getElementById('publishModal').classList.remove('active');
+        }
+
+        function initPublishForm() {
+            document.getElementById('publishForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const demand = {
+                    id: generateId(),
+                    title: document.getElementById('demandTitle').value.trim(),
+                    description: document.getElementById('demandDesc').value.trim(),
+                    budget: document.getElementById('demandBudget').value.trim(),
+                    status: 'open',
+                    author: '用户' + Math.floor(Math.random() * 1000),
+                    createdAt: new Date().toISOString()
+                };
+
+                demands.unshift(demand);
+                await saveDemands();
+                
+                closePublishModal();
+                document.getElementById('publishForm').reset();
+                renderDemands();
+                alert('✅ 需求发布成功！');
+            });
+        }
+
+        async function saveDemands() {
+            const blob = new Blob([JSON.stringify({ demands }, null, 2)], { type: 'application/json' });
+            console.log('需求数据已更新:', { demands });
+            alert('💡 数据已更新。在静态部署环境中，请手动下载并替换 demands.json 文件');
+        }
+
+        function contactDemand(id) {
+            alert('📧 联系功能开发中...');
+        }
+
+        function editDemand(id) {
+            window.location.href = `demands.html?edit=${id}`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 经验分享 - Mini-Application</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .article-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .article-card:hover {
+            transform: translateY(-3px);
+            border-color: #fdcb6e;
+        }
+        .article-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .article-excerpt {
+            opacity: 0.7;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .article-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85em;
+            opacity: 0.6;
+        }
+        .article-tags {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .tag {
+            padding: 4px 12px;
+            background: rgba(253,203,110,0.2);
+            border-radius: 12px;
+            font-size: 0.8em;
+            color: #fdcb6e;
+        }
+        .featured {
+            background: linear-gradient(135deg, rgba(253,203,110,0.1), rgba(253,203,110,0.05));
+            border-color: #fdcb6e;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="back-link">← 返回市场</a>
+            <h1>📚 经验分享</h1>
+            <p class="tagline">技术文章 · 最佳实践 · 经验教程</p>
+        </div>
+        <button class="btn btn-primary" onclick="showPublishModal()">✏️ 写文章</button>
+    </header>
+
+    <main class="main">
+        <section class="filters">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="tutorial">📖 教程</button>
+            <button class="filter-btn" data-filter="practice">💡 实践</button>
+            <button class="filter-btn" data-filter="thought">🤔 思考</button>
+        </section>
+
+        <section class="articles-list" id="articlesList">
+            <p class="empty-state">📭 暂无文章，成为第一位作者！</p>
+        </section>
+    </main>
+
+    <!-- 写文章弹窗 -->
+    <div class="modal" id="publishModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closePublishModal()">&times;</span>
+            <h2>✏️ 写文章</h2>
+            <form id="publishForm">
+                <div class="form-group">
+                    <label>文章标题 *</label>
+                    <input type="text" id="articleTitle" required placeholder="输入文章标题" maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label>分类 *</label>
+                    <select id="articleCategory" required>
+                        <option value="tutorial">📖 教程</option>
+                        <option value="practice">💡 实践</option>
+                        <option value="thought">🤔 思考</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>文章内容 *</label>
+                    <textarea id="articleContent" required placeholder="输入文章内容（支持 Markdown）" rows="10" class="code-area"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>标签（逗号分隔）</label>
+                    <input type="text" id="articleTags" placeholder="如：JavaScript, 前端, 最佳实践">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closePublishModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">发布文章</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>📚 经验分享 | 让知识流动起来</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        let articles = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadArticles();
+            initFilters();
+            initPublishForm();
+        });
+
+        async function loadArticles() {
+            try {
+                const response = await fetch('articles.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    articles = data.articles || [];
+                }
+            } catch (e) {}
+            renderArticles();
+        }
+
+        function renderArticles(filter = 'all') {
+            const list = document.getElementById('articlesList');
+            
+            if (articles.length === 0) {
+                list.innerHTML = '<p class="empty-state">📭 暂无文章，成为第一位作者！</p>';
+                return;
+            }
+
+            const filtered = filter === 'all' ? articles : articles.filter(a => a.category === filter);
+            
+            list.innerHTML = filtered.map(article => `
+                <article class="article-card" onclick="viewArticle('${article.id}')">
+                    <div class="article-title">${escapeHtml(article.title)}</div>
+                    <div class="article-excerpt">${escapeHtml(article.content.substring(0, 150))}...</div>
+                    <div class="article-meta">
+                        <span>👤 ${escapeHtml(article.author || '匿名')}</span>
+                        <span>📅 ${formatDate(article.createdAt)}</span>
+                        <span>👁️ ${article.views || 0} 阅读</span>
+                    </div>
+                    <div class="article-tags">
+                        <span class="tag">${getCategoryName(article.category)}</span>
+                        ${(article.tags || []).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function getCategoryName(category) {
+            const names = {
+                'tutorial': '📖 教程',
+                'practice': '💡 实践',
+                'thought': '🤔 思考'
+            };
+            return names[category] || '📝 文章';
+        }
+
+        function initFilters() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderArticles(btn.dataset.filter);
+                });
+            });
+        }
+
+        function showPublishModal() {
+            document.getElementById('publishModal').classList.add('active');
+        }
+
+        function closePublishModal() {
+            document.getElementById('publishModal').classList.remove('active');
+        }
+
+        function initPublishForm() {
+            document.getElementById('publishForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const article = {
+                    id: generateId(),
+                    title: document.getElementById('articleTitle').value.trim(),
+                    category: document.getElementById('articleCategory').value,
+                    content: document.getElementById('articleContent').value.trim(),
+                    tags: document.getElementById('articleTags').value.split(',').map(t => t.trim()).filter(t => t),
+                    author: '用户' + Math.floor(Math.random() * 1000),
+                    views: 0,
+                    createdAt: new Date().toISOString()
+                };
+
+                articles.unshift(article);
+                await saveArticles();
+                
+                closePublishModal();
+                document.getElementById('publishForm').reset();
+                renderArticles();
+                alert('✅ 文章发布成功！');
+            });
+        }
+
+        function viewArticle(id) {
+            alert('📖 文章详情页开发中...');
+        }
+
+        async function saveArticles() {
+            const blob = new Blob([JSON.stringify({ articles }, null, 2)], { type: 'application/json' });
+            console.log('文章数据已更新:', { articles });
+            alert('💡 数据已更新。在静态部署环境中，请手动下载并替换 articles.json 文件');
+        }
+    </script>
+</body>
+</html>

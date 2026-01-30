@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Mini-Application 微应用市场</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>🚀 Mini-Application</h1>
+            <p class="tagline">微应用市场 · 发现好工具 · 分享好经验</p>
+        </div>
+        <nav class="header-nav">
+            <a href="index.html" class="nav-link active">🏠 应用</a>
+            <a href="demands.html" class="nav-link">💬 需求</a>
+            <a href="articles.html" class="nav-link">📚 分享</a>
+            <a href="stats.html" class="nav-link">📊 统计</a>
+            <span id="authNav">
+                <a href="login.html" class="nav-link">👤 登录</a>
+            </span>
+            <a href="create.html" class="btn btn-primary">➕ 发布</a>
+        </nav>
+    </header>
+
+    <main class="main">
+        <section class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 搜索应用名称、描述或标签...">
+                <button class="btn btn-primary" onclick="handleSearch()">搜索</button>
+            </div>
+            <div class="tags-cloud" id="tagsCloud"></div>
+        </section>
+
+        <section class="filters">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="tool">🛠️ 工具</button>
+            <button class="filter-btn" data-filter="game">🎮 游戏</button>
+            <button class="filter-btn" data-filter="utility">📝 效率</button>
+            <button class="filter-btn" data-filter="other">📦 其他</button>
+        </section>
+
+        <section class="apps-grid" id="appsGrid">
+            <p class="empty-state">📭 暂无应用，点击「创建应用」添加第一个微应用！</p>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>🚀 Mini-Application 微应用市场 | 让每个人都能快速构建应用</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        let currentFilter = 'all';
+        let currentKeyword = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            initAuthNav();
+        });
+
+        // 初始化导航栏登录状态
+        function initAuthNav() {
+            const user = userStorage.getCurrentUser();
+            const authNav = document.getElementById('authNav');
+            
+            if (user) {
+                authNav.innerHTML = `
+                    <a href="profile.html" class="nav-link">👤 ${user.username}</a>
+                `;
+            }
+        }
+
+        async function initApp() {
+            renderApps();
+            renderTagsCloud();
+            initFilters();
+            initSearch();
+        }
+
+        async function renderApps() {
+            const grid = document.getElementById('appsGrid');
+            let apps = { applications: [] };
+            
+            try {
+                const localData = appStorage.getAll();
+                if (localData.applications.length > 0) {
+                    apps = localData;
+                } else {
+                    const response = await fetch('apps.json');
+                    if (response.ok) apps = await response.json();
+                }
+            } catch (e) {}
+
+            let applications = apps.applications || [];
+            
+            if (currentKeyword) {
+                const kw = currentKeyword.toLowerCase();
+                applications = applications.filter(a => 
+                    a.name.toLowerCase().includes(kw) ||
+                    a.description.toLowerCase().includes(kw) ||
+                    (a.tags && a.tags.some(t => t.toLowerCase().includes(kw)))
+                );
+            }
+
+            if (currentFilter !== 'all') {
+                applications = applications.filter(a => a.type === currentFilter);
+            }
+
+            if (applications.length === 0) {
+                grid.innerHTML = currentKeyword || currentFilter !== 'all' 
+                    ? '<p class="empty-state">🔍 没有找到匹配的应用</p>'
+                    : '<p class="empty-state">📭 暂无应用，点击「创建应用」添加第一个微应用！</p>';
+                return;
+            }
+
+            grid.innerHTML = applications.map(app => `
+                <article class="app-card" data-type="${app.type}" data-id="${app.id}">
+                    <div class="app-icon">${getAppIcon(app.type)}</div>
+                    <h3 class="app-name">${escapeHtml(app.name)}</h3>
+                    <p class="app-desc">${escapeHtml(app.description)}</p>
+                    <div class="app-tags">
+                        ${(app.tags || []).slice(0, 3).map(tag => `<span class="tag-small">${escapeHtml(tag)}</span>`).join('')}
+                    </div>
+                    <div class="app-meta">
+                        <span class="app-type">${getTypeName(app.type)}</span>
+                        <span class="app-views">👁️ ${app.views || 0}</span>
+                        <span class="app-date">${formatDate(app.createdAt)}</span>
+                    </div>
+                    <div class="app-actions">
+                        <button class="btn-small btn-open" onclick="openApp('${app.id}')">打开</button>
+                        <button class="btn-small btn-edit" onclick="editApp('${app.id}')">编辑</button>
+                        <button class="btn-small btn-delete" onclick="deleteApp('${app.id}')">删除</button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        async function renderTagsCloud() {
+            const cloud = document.getElementById('tagsCloud');
+            const apps = appStorage.getAll();
+            const tagCount = {};
+            
+            apps.applications.forEach(app => {
+                (app.tags || []).forEach(tag => {
+                    tagCount[tag] = (tagCount[tag] || 0) + 1;
+                });
+            });
+
+            const tags = Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([tag]) => tag);
+
+            if (tags.length === 0) {
+                cloud.innerHTML = '<p style="opacity:0.5;font-size:0.85em;">暂无标签</p>';
+                return;
+            }
+
+            cloud.innerHTML = tags.map(tag => `<span class="tag" onclick="searchByTag('${tag}')">${tag}</span>`).join('');
+        }
+
+        function initSearch() {
+            const input = document.getElementById('searchInput');
+            let timeout;
+            input.addEventListener('input', (e) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    currentKeyword = e.target.value.trim();
+                    renderApps();
+                }, 300);
+            });
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleSearch();
+            });
+        }
+
+        function handleSearch() {
+            currentKeyword = document.getElementById('searchInput').value.trim();
+            renderApps();
+        }
+
+        function searchByTag(tag) {
+            currentKeyword = tag;
+            document.getElementById('searchInput').value = tag;
+            currentFilter = 'all';
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-filter="all"]').classList.add('active');
+            renderApps();
+        }
+
+        function initFilters() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    renderApps();
+                });
+            });
+        }
+
+        function openApp(id) {
+            const app = appStorage.getById(id);
+            if (app) appStorage.update(id, { views: (app.views || 0) + 1 });
+            window.location.href = `app.html?id=${id}`;
+        }
+
+        function editApp(id) {
+            window.location.href = `create.html?id=${id}`;
+        }
+
+        function deleteApp(id) {
+            if (!confirm('确定要删除这个应用吗？')) return;
+            appStorage.delete(id);
+            renderApps();
+            renderTagsCloud();
+            alert('✅ 应用已删除');
+        }
+    </script>
+</body>
+</html>
