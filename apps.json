@@ -59,6 +59,95 @@
       "authorName": "Demo",
       "views": 178,
       "createdAt": "2026-01-30T00:20:00Z"
-    }
-  ]
-}
+    },
+    {
+      "id": "app006",
+      "name": "🎯 密码生成器",
+      "description": "生成安全的随机密码",
+      "type": "tool",
+      "tags": ["工具", "安全", "密码"],
+      "code": "<div style='max-width:500px;margin:30px auto;padding:30px;font-family:sans-serif;background:#fff;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1)'><h2 style='text-align:center;margin-bottom:30px'>🎯 密码生成器</h2><div id='password' style='font-size:24px;font-family:monospace;padding:20px;background:#f0f4ff;border-radius:10px;margin-bottom:20px;text-align:center;word-break:break-all;color:#667eea;font-weight:bold'>点击生成</div><div style='display:flex;gap:10px;margin-bottom:20px'><label style='display:flex;align-items:center;gap:5px'><input type='checkbox' id='upper' checked>大写</label><label style='display:flex;align-items:center;gap:5px'><input type='checkbox' id='lower' checked>小写</label><label style='display:flex;align-items:center;gap:5px'><input type='checkbox' id='number' checked>数字</label><label style='display:flex;align-items:center;gap:5px'><input type='checkbox' id='symbol' checked>符号</label></div><div style='margin-bottom:20px'><label style='display:block;margin-bottom:8px'>长度: <span id='lenVal'>16</span></label><input type='range' id='length' min='8' max='32' value='16' oninput='document.getElementById(\"lenVal\").textContent=this.value' style='width:100%'></div><button onclick='generate()' style='width:100%;padding:15px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:10px;cursor:pointer;font-size:16px'>生成密码</button><button onclick='copyPass()' style='width:100%;padding:12px;border:none;background:#00b894;color:#fff;border-radius:10px;cursor:pointer;font-size:16px;margin-top:10px'>复制密码</button></div><script>function generate(){let chars='',len=parseInt(document.getElementById('length').value);if(document.getElementById('upper').checked)chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';if(document.getElementById('lower').checked)chars+='abcdefghijklmnopqrstuvwxyz';if(document.getElementById('number').checked)chars+='0123456789';if(document.getElementById('symbol').checked)chars+='!@#$%^&*()_+-=[]{}|;:,.<>?';let pass='';for(let i=0;i<len;i++)pass+=chars.charAt(Math.floor(Math.random()*chars.length));document.getElementById('password').textContent=pass}function copyPass(){navigator.clipboard.writeText(document.getElementById('password').textContent);alert('密码已复制！')}generate()</script>",
+      "authorId": "demo",
+      "authorName": "Demo",
+      "views": 203,
+      "createdAt": "2026-01-30T00:25:00Z"
+    },
+    {
+      "id": "app007",
+      "name": "✂️ 文字工具箱",
+      "description": "文字大小写转换、去除空格",
+      "type": "utility",
+      "tags": ["工具", "文字", "处理"],
+      "code": "<div style='max-width:600px;margin:30px auto;padding:30px;font-family:sans-serif;background:#fff;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1)'><h2 style='text-align:center;margin-bottom:30px'>✂️ 文字工具箱</h2><textarea id='input' placeholder='输入要处理的文字...' style='width:100%;height:100px;padding:15px;border:2px solid #eee;border-radius:10px;font-size:16px;resize:vertical;margin-bottom:15px'></textarea><div style='display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px'><button onclick='toUpper()' style='padding:10px 20px;border:none;background:#667eea;color:#fff;border-radius:8px;cursor:pointer'>大写</button><button onclick='toLower()' style='padding:10px 20px;border:none;background:#00b894;color:#fff;border-radius:8px;cursor:pointer'>小写</button><button onclick='toCapitalize()' style='padding:10px 20px;border:none;background:#fdcb6e;color:#333;border-radius:8px;cursor:pointer'>首字母大写</button><button onclick='trimSpace()' style='padding:10px 20px;border:none;background:#e17055;color:#fff;border-radius:8px;cursor:pointer'>去除空格</button><button onclick='removeEmpty()' style='padding:10px 20px;border:none;background:#6c5ce7;color:#fff;border-radius:8px;cursor:pointer'>去除空行</button></div><textarea id='output' readonly placeholder='处理结果...' style='width:100%;height:100px;padding:15px;border:2px solid #667eea;border-radius:10px;font-size:16px;resize:vertical;background:#f0f4ff'></textarea><button onclick='copyResult()' style='padding:12px 30px;border:none;background:#00b894;color:#fff;border-radius:10px;cursor:pointer;font-size:16px;margin-top:10px'>复制结果</button></div><script>function toUpper(){document.getElementById('output').value=document.getElementById('input').value.toUpperCase()}function toLower(){document.getElementById('output').value=document.getElementById('input').value.toLowerCase()}function toCapitalize(){const text=document.getElementById('input').value;document.getElementById('output').value=text.replace(/\\b\\w/g,c=>c.toUpperCase())}function trimSpace(){document.getElementById('output').value=document.getElementById('input').value.replace(/\\s/g,'')}function removeEmpty(){document.getElementById('output').value=document.getElementById('input').value.replace(/\\n\\s*\\n/g,'\\n')}function copyResult(){navigator.clipboard.writeText(document.getElementById('output').value);alert('已复制！')}</script>",
+      "authorId": "demo",
+      "authorName": "Demo",
+      "views": 167,
+      "createdAt": "2026-01-30T00:30:00Z"
+    },
+    {
+      "id": "app008",
+      "name": "🪨 石头剪刀布",
+      "description": "经典石头剪刀布游戏",
+      "type": "game",
+      "tags": ["游戏", "经典", "随机"],
+      "code": "<div style='text-align:center;padding:40px;font-family:sans-serif'><h2>🪨 石头剪刀布</h2><div style='font-size:80px;margin:20px'>🖐️ ✊ ✌️</div><div id='result' style='font-size:24px;margin:20px;min-height:40px;color:#667eea;font-weight:bold'>选择你的出招</div><div style='display:flex;gap:20px;justify-content:center;margin:30px'><button onclick='play(0)' style='width:100px;height:100px;font-size:40px;border:none;background:#fff;border-radius:15px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.1);transition:transform 0.2s'>✊</button><button onclick='play(1)' style='width:100px;height:100px;font-size:40px;border:none;background:#fff;border-radius:15px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.1);transition:transform 0.2s'>✌️</button><button onclick='play(2)' style='width:100px;height:100px;font-size:40px;border:none;background:#fff;border-radius:15px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.1);transition:transform 0.2s'>🖐️</button></div><div style='display:flex;justify-content:center;gap:40px;font-size:18px'><div>你的得分: <span id='playerScore' style='color:#00b894;font-weight:bold'>0</span></div><div>电脑得分: <span id='aiScore' style='color:#ff6b6b;font-weight:bold'>0</span></div></div></div><script>const moves=['✊','✌️','🖐️'];let player=0,ai=0;function play(p){const a=Math.floor(Math.random()*3);let r='';if(p===a)r='平局！';else if((p===0&&a===2)||(p===1&&a===0)||(p===2&&a===1)){r='你赢了！🎉';player++}else{r='电脑赢了！🤖';ai++}document.getElementById('result').innerHTML='你: '+moves[p]+' vs '+moves[a]+' :电脑<br>'+r;document.getElementById('playerScore').textContent=player;document.getElementById('aiScore').textContent=ai}</script>",
+      "authorId": "demo",
+      "authorName": "Demo",
+      "views": 312,
+      "createdAt": "2026-01-30T00:35:00Z"
+    },
+    {
+      "id": "app009",
+      "name": "🎰 老虎机",
+      "description": "简单老虎机游戏",
+      "type": "game",
+      "tags": ["游戏", "娱乐", "概率"],
+      "code": "<div style='text-align:center;padding:40px;font-family:sans-serif'><h2>🎰 老虎机</h2><div style='display:flex;justify-content:center;gap:15px;margin:30px'><div id='slot1' style='width:80px;height:100px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:15px;font-size:50px;display:flex;align-items:center;justify-content:center;color:#fff'>🍒</div><div id='slot2' style='width:80px;height:100px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:15px;font-size:50px;display:flex;align-items:center;justify-content:center;color:#fff'>🍒</div><div id='slot3' style='width:80px;height:100px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:15px;font-size:50px;display:flex;align-items:center;justify-content:center;color:#fff'>🍒</div></div><div id='message' style='font-size:20px;margin:20px;min-height:30px;color:#667eea;font-weight:bold'>开始游戏！</div><button onclick='spin()' style='padding:15px 50px;font-size:18px;border:none;background:linear-gradient(135deg,#fdcb6e,#e17055);color:#fff;border-radius:25px;cursor:pointer;font-weight:bold'>旋转 🎰</button><div style='margin-top:20px;font-size:16px'>金币: <span id='coins' style='color:#fdcb6e;font-weight:bold'>100</span></div></div><script>const symbols=['🍒','🍋','🍊','🍇','⭐','🔔'];let coins=100;function spin(){if(coins<10){document.getElementById('message').textContent='金币不足！';return}coins-=10;const s=[rand(),rand(),rand()];['slot1','slot2','slot3'].forEach((id,i)=>document.getElementById(id).textContent=s[i]);if(s[0]===s[1]&&s[1]===s[2]){coins+=50;document.getElementById('message').textContent='Jackpot! 大奖！🎉'}else if(s[0]===s[1]||s[1]===s[2]||s[0]===s[2]){coins+=20;document.getElementById('message').textContent='小奖！🎊'}else{document.getElementById('message').textContent='再接再厉！'}document.getElementById('coins').textContent=coins}function rand(){return symbols[Math.floor(Math.random()*symbols.length)]}</script>",
+      "authorId": "demo",
+      "authorName": "Demo",
+      "views": 287,
+      "createdAt": "2026-01-30T00:40:00Z"
+    },
+    {
+      "id": "app010",
+      "name": "🎯 猜数字",
+      "description": "1-100猜数字，看谁更快",
+      "type": "game",
+      "tags": ["游戏", "益智", "数字"],
+      "code": "<div style='max-width:500px;margin:30px auto;padding:30px;font-family:sans-serif;background:#fff;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1)'><h2 style='text-align:center;margin-bottom:20px'>🎯 猜数字</h2><p style='text-align:center;color:#666;margin-bottom:20px'>我想了一个1-100的数字，猜猜看？</p><div style='display:flex;gap:10px;margin-bottom:20px'><input type='number' id='guess' min='1' max='100' placeholder='输入数字' style='flex:1;padding:12px;border:2px solid #667eea;border-radius:10px;font-size:18px;text-align:center'><button onclick='check()' style='padding:12px 25px;border:none;background:#667eea;color:#fff;border-radius:10px;cursor:pointer;font-size:16px'>猜</button></div><div id='hint' style='text-align:center;font-size:18px;min-height:30px;margin-bottom:15px;color:#667eea;font-weight:bold'></div><div id='history' style='background:#f8f9fa;padding:15px;border-radius:10px;max-height:150px;overflow-y:auto;font-size:14px;color:#666'></div><p style='text-align:center;font-size:14px;color:#999;margin-top:15px'>已猜 <span id='attempts'>0</span> 次</p><button onclick='restart()' style='display:block;margin:15px auto;padding:10px 25px;border:none;background:#95a5a6;color:#fff;border-radius:8px;cursor:pointer'>重新开始</button></div><script>let target=Math.floor(Math.random()*100)+1;let attempts=0;const history=[];function check(){const g=parseInt(document.getElementById('guess').value);if(!g||g<1||g>100){document.getElementById('hint').textContent='请输入1-100的数字';return}attempts++;history.push(g);document.getElementById('attempts').textContent=attempts;let h='';if(g===target){h='🎉 恭喜！你猜对了！';document.getElementById('hint').style.color='#00b894'}else if(g<target){h='📈 大一点'}else{h='📉 小一点'}document.getElementById('hint').textContent=h;document.getElementById('history').textContent='猜测记录: '+history.join(' → ')}function restart(){target=Math.floor(Math.random()*100)+1;attempts=0;history.length=0;document.getElementById('guess').value='';document.getElementById('hint').textContent='';document.getElementById('history').textContent='';document.getElementById('attempts').textContent='0';document.getElementById('hint').style.color='#667eea'}</script>",
+      "authorId": "demo",
+      "authorName": "Demo",
+      "views": 198,
+      "createdAt": "2026-01-30T00:45:00Z"
+    },
+    {
+      "id": "app011",
+      "name": "🃏 21点",
+      "description": "经典纸牌游戏21点",
+      "type": "game",
+      "tags": ["游戏", "纸牌", "经典"],
+      "code": "<div style='text-align:center;padding:30px;font-family:sans-serif'><h2>🃏 21点</h2><div style='margin:20px'><p style='color:#666'>电脑的牌</p><div id='dealerCards' style='font-size:32px;min-height:50px;letter-spacing:5px'>🂠 🂠</div><div id='dealerScore' style='color:#ff6b6b;margin-top:5px'></div></div><div style='margin:20px'><p style='color:#666'>你的牌</p><div id='playerCards' style='font-size:32px;min-height:50px;letter-spacing:5px'></div><div id='playerScore' style='color:#00b894;margin-top:5px;font-weight:bold'></div></div><div id='message' style='font-size:20px;min-height:30px;margin:20px;font-weight:bold;color:#667eea'></div><div style='display:flex;gap:10px;justify-content:center'><button onclick='hit()' style='padding:12px 25px;border:none;background:#00b894;color:#fff;border-radius:10px;cursor:pointer;font-size:16px'>要牌</button><button onclick='stand()' style='padding:12px 25px;border:none;background:#667eea;color:#fff;border-radius:10px;cursor:pointer;font-size:16px'>停牌</button><button onclick='restart()' style='padding:12px 25px;border:none;background:#95a5a6;color:#fff;border-radius:10px;cursor:pointer;font-size:16px'>重新开始</button></div></div><script>const suits=['♠️','♥️','♦️','♣️'];const values=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];let deck=[],player=[],dealer=[],gameOver=false;function initDeck(){deck=[];for(let s of suits)for(let v of values)deck.push(s+v);for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}}function getValue(card){const v=card.slice(0,-1);if(v==='A')return 11;if(['K','Q','J'].includes(v))return 10;return parseInt(v)}function score(hand){let s=hand.reduce((a,c)=>a+getValue(c),0);let aces=hand.filter(c=>c.startsWith('A')).length;while(s>21&&aces>0){s-=10;aces--}return s}function start(){initDeck();player=[deck.pop(),deck.pop()];dealer=[deck.pop(),deck.pop()];gameOver=false;update()}function hit(){player.push(deck.pop());if(score(player)>21)end('你爆牌了！💥 游戏结束');else update()}function stand(){while(score(dealer)<17)dealer.push(deck.pop());end()}function end(msg){gameOver=true;const p=score(player),d=score(dealer);if(!msg){if(p>d)msg='你赢了！🎉';else if(p<d)msg='电脑赢了！🤖';else msg='平局！🤝'}document.getElementById('message').textContent=msg}function update(){document.getElementById('playerCards').textContent=player.join(' ');document.getElementById('playerScore').textContent=score(player);if(gameOver){document.getElementById('dealerCards').textContent=dealer.join(' ');document.getElementById('dealerScore').textContent=score(dealer)}else{document.getElementById('dealerCards').textContent=dealer[0]+' 🂠';document.getElementById('dealerScore').textContent=''}document.getElementById('message').textContent=gameOver?document.getElementById('message').textContent:'进行中...'}start()</script>",
+      "authorId": "demo",
+      "authorName": "Demo",
+      "views": 156,
+      "createdAt": "2026-01-30T00:50:00Z"
+    },
+    {
+      "id": "app012",
+      "name": "🔗 二维码生成器",
+      "description": "输入文字生成二维码",
+      "type": "other",
+      "tags": ["工具", "二维码", "生成"],
+      "code": "<div style='max-width:500px;margin:30px auto;padding:30px;font-family:sans-serif;background:#fff;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1)'><h2 style='text-align:center;margin-bottom:30px'>🔗 二维码生成器</h2><textarea id='text' placeholder='输入文字或链接...' style='width:100%;height:80px;padding:15px;border:2px solid #eee;border-radius:10px;font-size:16px;resize:none;margin-bottom:15px'></textarea><button onclick='generateQR()' style='width:100%;padding:15px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:10px;cursor:pointer;font-size:16px;margin-bottom:20px'>生成二维码</button><div id='qrcode' style='text-align:center;min-height:200px'><p style='color:#999;margin-top:80px'>二维码将显示在这里</p></div><p style='text-align:center;font-size:12px;color:#999;margin-top:15px'>使用第三方API生成</p></div><script>function generateQR(){const text=document.getElementById('text').value.trim();if(!text){alert('请输入内容');return}const url='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(text);document.getElementById('qrcode').innerHTML='<img src=\"'+url+'\" style=\"width:200px;height:200px;border-radius:10px\" alt=\"QR Code\">'}</script>",
+      "authorId": "demo",
+      "authorName": "Demo",
+      "views": 245,
+      "createdAt": "2026-01-30T00:55:00Z"
+    },
+    {
+      "id": "app013",
+      "name": "🎵 节拍器",
+      "description": "简单的节拍器工具",
+      "type": "other",
+      "tags": ["工具", "音乐", "节拍"],
+      "code": "<div style='text-align:center;padding:40px;font-family:sans-serif'><h2>🎵 节拍器</h2><div id='bpmDisplay' style='font-size:80px;font-weight:bold;color:#667eea;margin:20px'>120</div><p style='color:#666;margin-bottom:30px'>每分钟节拍数 (BPM)</p><div style='display:flex;gap:20px;justify-content:center;margin-bottom:30px'><button onclick='changeBpm(-10)' style='padding:15px 25px;border:none;background:#ff6b6b;color:#fff;border-radius:10px;cursor:pointer;font-size:18px'>-10</button><button onclick='changeBpm(-1)' style='padding:15px 20px;border:none;background:#fdcb6e;color:#333;border-radius:10px;cursor:pointer;font-size:18px'>-1</button><button id='toggleBtn' onclick='toggle()' style='padding:15px 40px;border:none;background:#00b894;color:#fff;border-radius:10px;cursor:pointer;font-size:18
