@@ -1,0 +1,64 @@
+{
+  "applications": [
+    {
+      "id": "ai-pwd-gen",
+      "name": "AI密码生成器",
+      "description": "智能生成安全密码，支持自定义长度和复杂度",
+      "type": "tool",
+      "tags": ["安全", "密码", "AI"],
+      "author": "系统",
+      "code": "function generatePassword(length = 16, options = { uppercase: true, numbers: true, symbols: true }) { const lowercase = 'abcdefghijklmnopqrstuvwxyz'; const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; const numbers = '0123456789'; const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?'; let chars = lowercase; if (options.uppercase) chars += uppercase; if (options.numbers) chars += numbers; if (options.symbols) chars += symbols; let password = ''; for (let i = 0; i < length; i++) { password += chars.charAt(Math.floor(Math.random() * chars.length)); } return password; }",
+      "views": 0,
+      "likes": 0,
+      "createdAt": "2026-01-31T12:30:00Z"
+    },
+    {
+      "id": "ai-text-summarizer",
+      "name": "AI文本摘要",
+      "description": "智能提取文本要点，生成简洁摘要",
+      "type": "utility",
+      "tags": ["文本", "摘要", "AI"],
+      "author": "系统",
+      "code": "function summarizeText(text, maxLength = 100) { const sentences = text.split(/[.!?]+/).filter(s => s.trim()); if (sentences.length <= 2) return text.substring(0, maxLength); const important = sentences.sort((a, b) => b.length - a.length).slice(0, Math.min(3, sentences.length)); return important.join('. ').substring(0, maxLength) + '...'; }",
+      "views": 0,
+      "likes": 0,
+      "createdAt": "2026-01-31T12:31:00Z"
+    },
+    {
+      "id": "ai-sentiment",
+      "name": "AI情感分析",
+      "description": "智能识别文本情感倾向，正面/负面/中性",
+      "type": "utility",
+      "tags": ["情感", "分析", "AI"],
+      "author": "系统",
+      "code": "function analyzeSentiment(text) { const positive = ['好', '棒', '优秀', '喜欢', '开心', '满意', '精彩', '完美', '强大', '智能']; const negative = ['差', '坏', '糟糕', '不喜欢', '生气', '失望', '垃圾', '无用', '慢', '丑']; let score = 0; positive.forEach(w => { if (text.includes(w)) score++; }); negative.forEach(w => { if (text.includes(w)) score--; }); if (score > 0) return '😊 正面'; if (score < 0) return '😔 负面'; return '😐 中性'; }",
+      "views": 0,
+      "likes": 0,
+      "createdAt": "2026-01-31T12:32:00Z"
+    },
+    {
+      "id": "ai-keyword",
+      "name": "AI关键词提取",
+      "description": "自动从长文本中提取核心关键词",
+      "type": "utility",
+      "tags": ["关键词", "提取", "AI"],
+      "author": "系统",
+      "code": "function extractKeywords(text, maxCount = 5) { const stopWords = ['的', '了', '是', '在', '和', '与', '或', '等', '这', '那', '有', '没有', '就', '也', '都', '而', '及', '与', '着']; const words = text.split(/[\\s,，。！？、]+/).filter(w => w.length > 1 && !stopWords.includes(w)); const wordCount = {}; words.forEach(w => { const key = w; wordCount[key] = (wordCount[key] || 0) + 1; }); return Object.entries(wordCount).sort((a, b) => b[1] - a[1]).slice(0, maxCount).map(([word]) => word); }",
+      "views": 0,
+      "likes": 0,
+      "createdAt": "2026-01-31T12:33:00Z"
+    },
+    {
+      "id": "ai-translator",
+      "name": "AI语言转换",
+      "description": "模拟AI翻译，将中文转为E文首字母大写",
+      "type": "utility",
+      "tags": ["翻译", "转换", "AI"],
+      "author": "系统",
+      "code": "function translateToAI(text) { return text.split('').map(char => { const code = char.charCodeAt(0); if (code >= 0x4E00 && code <= 0x9FA5) { return String.fromCharCode(code + 96); } return char; }).join('').replace(/[a-z]/g, c => c.toUpperCase()); }",
+      "views": 0,
+      "likes": 0,
+      "createdAt": "2026-01-31T12:34:00Z"
+    }
+  ]
+}

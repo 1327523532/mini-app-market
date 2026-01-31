@@ -150,4 +150,70 @@
       "description": "简单的节拍器工具",
       "type": "other",
       "tags": ["工具", "音乐", "节拍"],
-      "code": "<div style='text-align:center;padding:40px;font-family:sans-serif'><h2>🎵 节拍器</h2><div id='bpmDisplay' style='font-size:80px;font-weight:bold;color:#667eea;margin:20px'>120</div><p style='color:#666;margin-bottom:30px'>每分钟节拍数 (BPM)</p><div style='display:flex;gap:20px;justify-content:center;margin-bottom:30px'><button onclick='changeBpm(-10)' style='padding:15px 25px;border:none;background:#ff6b6b;color:#fff;border-radius:10px;cursor:pointer;font-size:18px'>-10</button><button onclick='changeBpm(-1)' style='padding:15px 20px;border:none;background:#fdcb6e;color:#333;border-radius:10px;cursor:pointer;font-size:18px'>-1</button><button id='toggleBtn' onclick='toggle()' style='padding:15px 40px;border:none;background:#00b894;color:#fff;border-radius:10px;cursor:pointer;font-size:18
+      "code": "<div style='text-align:center;padding:40px;font-family:sans-serif'><h2>🎵 节拍器</h2><div id='bpmDisplay' style='font-size:80px;font-weight:bold;color:#667eea;margin:20px'>120</div><p style='color:#666;margin-bottom:30px'>每分钟节拍数 (BPM)</p><div style='display:flex;gap:20px;justify-content:center;margin-bottom:30px'><button onclick='changeBpm(-10)' style='padding:15px 25px;border:none;background:#ff6b6b;color:#fff;border-radius:10px;cursor:pointer;font-size:18px'>-10</button><button onclick='changeBpm(-1)' style='padding:15px 20px;border:none;background:#fdcb6e;color:#333;border-radius:10px;cursor:pointer;font-size:18px'>-1</button><button id='toggleBtn' onclick='toggle()' style='padding:15px 40px;border:none;background:#00b894;color:#fff;border-radius:10px;cursor:pointer;font-size:18    ,
+    {
+      "id": "ai-pwd-gen",
+      "name": "🔐 AI密码生成器",
+      "description": "智能生成安全密码，支持自定义长度和复杂度",
+      "type": "tool",
+      "tags": ["安全", "密码", "AI"],
+      "authorId": "ai",
+      "authorName": "AI助手",
+      "code": "<div style='max-width:400px;margin:30px auto;padding:30px;font-family:sans-serif;background:#fff;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1)'><h2 style='text-align:center;margin-bottom:30px'>🔐 AI密码生成器</h2><div id='password' style='font-size:28px;font-weight:bold;text-align:center;padding:20px;background:#f8f9fa;border-radius:10px;margin-bottom:20px;word-break:break-all;color:#667eea'>点击生成</div><div style='margin-bottom:20px'><label style='display:block;margin-bottom:10px'>长度: <span id='lenVal'>16</span></label><input type='range' id='length' min='8' max='32' value='16' oninput='document.getElementById(\"lenVal\").textContent=this.value' style='width:100%'></div><div style='margin-bottom:20px'><label style='display:flex;align-items:center;gap:10px;margin-bottom:10px'><input type='checkbox' id='uppercase' checked> 大写字母</label><label style='display:flex;align-items:center;gap:10px;margin-bottom:10px'><input type='checkbox' id='numbers' checked> 数字</label><label style='display:flex;align-items:center;gap:10px'><input type='checkbox' id='symbols' checked> 特殊符号</label></div><button onclick='generate()' style='width:100%;padding:15px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:10px;cursor:pointer;font-size:16px;margin-bottom:15px'>生成密码</button><button onclick='copyPwd()' style='width:100%;padding:15px;border:none;background:#00b894;color:#fff;border-radius:10px;cursor:pointer;font-size:16px'>复制密码</button></div><script>function generate(){const len=parseInt(document.getElementById('length').value);const low='abcdefghijklmnopqrstuvwxyz';const up='ABCDEFGHIJKLMNOPQRSTUVWXYZ';const num='0123456789';const sym='!@#$%^&*()_+-=[]{}|;:,.<>?';let chars=low;if(document.getElementById('uppercase').checked)chars+=up;if(document.getElementById('numbers').checked)chars+=num;if(document.getElementById('symbols').checked)chars+=sym;let pwd='';for(let i=0;i<len;i++)pwd+=chars.charAt(Math.floor(Math.random()*chars.length));document.getElementById('password').textContent=pwd}function copyPwd(){const pwd=document.getElementById('password').textContent;if(pwd!=='点击生成'){navigator.clipboard.writeText(pwd);alert('密码已复制！')}}generate()</script>",
+      "views": 0,
+      "createdAt": "2026-01-31T12:30:00Z"
+    }
+    ,
+    {
+      "id": "ai-text-summarizer",
+      "name": "📝 AI文本摘要",
+      "description": "智能提取文本要点，生成简洁摘要",
+      "type": "utility",
+      "tags": ["文本", "摘要", "AI"],
+      "authorId": "ai",
+      "authorName": "AI助手",
+      "code": "<div style='max-width:600px;margin:30px auto;padding:30px;font-family:sans-serif;background:#fff;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1)'><h2 style='text-align:center;margin-bottom:30px'>📝 AI文本摘要</h2><textarea id='input' placeholder='请输入长文本...' style='width:100%;height:120px;padding:15px;border:2px solid #eee;border-radius:10px;font-size:14px;resize:vertical;margin-bottom:15px'></textarea><div style='display:flex;gap:10px;margin-bottom:20px'><input type='number' id='maxLen' value='100' min='50' max='300' style='width:80px;padding:10px;border:2px solid #eee;border-radius:10px'>字<button onclick='summarize()' style='flex:1;padding:12px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:10px;cursor:pointer'>生成摘要</button></div><div style='background:#f8f9fa;padding:20px;border-radius:10px;min-height:80px'><h4 style='margin-bottom:10px;color:#667eea'>摘要结果:</h4><p id='output' style='color:#333;line-height:1.8'></p></div></div><script>function summarize(){const text=document.getElementById('input').value;const maxLen=parseInt(document.getElementById('maxLen').value);if(!text.trim()){alert('请输入文本');return}const sentences=text.split(/[.!?]+/).filter(s=>s.trim().length>5);let summary=text.substring(0,maxLen);if(sentences.length>1){const imp=sentences.sort((a,b)=>b.length-a.length).slice(0,Math.min(3,sentences.length));summary=imp.join('. ').substring(0,maxLen)+'...'}document.getElementById('output').textContent=summary}</script>",
+      "views": 0,
+      "createdAt": "2026-01-31T12:31:00Z"
+    }
+    ,
+    {
+      "id": "ai-sentiment",
+      "name": "😊 AI情感分析",
+      "description": "智能识别文本情感倾向，正面/负面/中性",
+      "type": "utility",
+      "tags": ["情感", "分析", "AI"],
+      "authorId": "ai",
+      "authorName": "AI助手",
+      "code": "<div style='max-width:500px;margin:30px auto;padding:30px;font-family:sans-serif;background:#fff;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1)'><h2 style='text-align:center;margin-bottom:30px'>😊 AI情感分析</h2><textarea id='text' placeholder='输入一段文字...' style='width:100%;height:100px;padding:15px;border:2px solid #eee;border-radius:10px;font-size:14px;resize:vertical;margin-bottom:15px'></textarea><button onclick='analyze()' style='width:100%;padding:15px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:10px;cursor:pointer;font-size:16px'>分析情感</button><div id='result' style='margin-top:25px;text-align:center;display:none'><div id='emoji' style='font-size:60px;margin-bottom:15px'></div><div id='label' style='font-size:24px;font-weight:bold;margin-bottom:10px'></div><div id='score' style='color:#666'></div></div></div><script>function analyze(){const text=document.getElementById('text').value;if(!text.trim()){alert('请输入文本');return}const pos=['好','棒','优秀','喜欢','开心','满意','精彩','完美','强大','智能','赞','厉害','牛','优秀','出色','成功','高兴','快乐','幸福','爱'];const neg=['差','坏','糟糕','不喜欢','生气','失望','垃圾','无用','慢','丑','失败','难过','痛苦','讨厌','恶心','烦','累','难'];let score=0;pos.forEach(w=>{if(text.includes(w))score++});neg.forEach(w=>{if(text.includes(w))score--});const result=document.getElementById('result');result.style.display='block';if(score>0){document.getElementById('emoji').textContent='😊';document.getElementById('label').textContent='正面情感';document.getElementById('label').style.color='#00b894';document.getElementById('score').textContent='情感得分: +'+score}else if(score<0){document.getElementById('emoji').textContent='😔';document.getElementById('label').textContent='负面情感';document.getElementById('label').style.color='#ff6b6b';document.getElementById('score').textContent='情感得分: '+score}else{document.getElementById('emoji').textContent='😐';document.getElementById('label').textContent='中性情感';document.getElementById('label').style.color='#666';document.getElementById('score').textContent='情感得分: 0'}}}</script>",
+      "views": 0,
+      "createdAt": "2026-01-31T12:32:00Z"
+    }
+    ,
+    {
+      "id": "ai-keyword",
+      "name": "🔑 AI关键词提取",
+      "description": "自动从长文本中提取核心关键词",
+      "type": "utility",
+      "tags": ["关键词", "提取", "AI"],
+      "authorId": "ai",
+      "authorName": "AI助手",
+      "code": "<div style='max-width:600px;margin:30px auto;padding:30px;font-family:sans-serif;background:#fff;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1)'><h2 style='text-align:center;margin-bottom:30px'>🔑 AI关键词提取</h2><textarea id='text' placeholder='输入一段文字...' style='width:100%;height:120px;padding:15px;border:2px solid #eee;border-radius:10px;font-size:14px;resize:vertical;margin-bottom:15px'></textarea><div style='display:flex;gap:10px;margin-bottom:20px'><input type='number' id='count' value='5' min='3' max='10' style='width:60px;padding:10px;border:2px solid #eee;border-radius:10px;text-align:center'>个<button onclick='extract()' style='flex:1;padding:12px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:10px;cursor:pointer'>提取关键词</button></div><div id='tags' style='display:flex;flex-wrap:wrap;gap:10px;margin-top:15px'></div></div><script>function extract(){const text=document.getElementById('text').value;const maxCount=parseInt(document.getElementById('count').value);if(!text.trim()){alert('请输入文本');return}const stops=['的','了','是','在','和','与','或','等','这','那','有','没有','就','也','都','而','及','着','把','被','为','以','于','从','到','对于','关于','通过','根据','按照'];const words=text.split(/[\\s,，。！？、]+/).filter(w=>w.length>1&&!stops.includes(w));const count={};words.forEach(w=>{const k=w;count[k]=(count[k]||0)+1});const tags=Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,maxCount).map(([w])=>w);const container=document.getElementById('tags');container.innerHTML=tags.map(tag=>`<span style='padding:8px 16px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:20px;font-size:14px'>${tag}</span>`).join('')}</script>",
+      "views": 0,
+      "createdAt": "2026-01-31T12:33:00Z"
+    }
+    ,
+    {
+      "id": "ai-translator",
+      "name": "🌐 AI语言转换",
+      "description": "有趣的AI风格语言转换器",
+      "type": "utility",
+      "tags": ["翻译", "转换", "AI"],
+      "authorId": "ai",
+      "authorName": "AI助手",
+      "code": "<div style='max-width:500px;margin:30px auto;padding:30px;font-family:sans-serif;background:#fff;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.1)'><h2 style='text-align:center;margin-bottom:30px'>🌐 AI语言转换器</h2><textarea id='input' placeholder='输入中文...' style='width:100%;height:100px;padding:15px;border:2px solid #eee;border-radius:10px;font-size:14px;resize:vertical;margin-bottom:15px'></textarea><div style='display:flex;gap:10px;margin-bottom:20px'><button onclick='translateText()' style='flex:1;padding:12px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:10px;cursor:pointer'>转换为AI语言</button><button onclick='cleanText()' style='padding:12px 20px;border:none;background:#95a5a6;color:#fff;border-radius:10px;cursor:pointer'>清除</button></div><div style='background:#f8f9fa;padding:20px;border-radius:10px;min-height:80px'><h4 style='margin-bottom:10px;color:#667eea'>转换结果:</h4><p id='output' style='font-size:18px;letter-spacing:2px;color:#333'></p></div></div><script>function translateText(){const text=document.getElementById('input').value;if(!text.trim()){alert('请输入文本');return}const result=text.split('').map(char=>{const code=char.charCodeAt(0);if(code>=0x4E00&&code<=0x9FA5){return String.fromCharCode(code+96)}return char}).join('').replace(/[a-z]/g,c=>c.toUpperCase());document.getElementById('output').textContent=result}function cleanText(){document.getElementById('input').value='';document.getElementById('output').textContent=''}</script>",
+      "views": 0,
+      "createdAt": "2026-01-31T12:34:00Z"
+    }
+  ]
+}
