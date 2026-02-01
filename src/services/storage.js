@@ -117,7 +117,63 @@ class BaseStorage {
       results = results.filter(item => item.type === criteria.type);
     }
 
+    // 标签筛选
+    if (criteria.tags && criteria.tags.length > 0) {
+      results = results.filter(item => {
+        if (!item.tags || !Array.isArray(item.tags)) return false;
+        // 包含任一标签
+        if (criteria.matchType === 'any') {
+          return criteria.tags.some(tag => item.tags.includes(tag));
+        }
+        // 包含所有标签
+        return criteria.tags.every(tag => item.tags.includes(tag));
+      });
+    }
+
     return results;
+  }
+
+  /**
+   * 获取所有标签
+   */
+  getAllTags() {
+    const data = this.getAll();
+    const tagsSet = new Set();
+    data.data.forEach(item => {
+      if (item.tags && Array.isArray(item.tags)) {
+        item.tags.forEach(tag => tagsSet.add(tag));
+      }
+    });
+    return Array.from(tagsSet).sort();
+  }
+
+  /**
+   * 按标签获取应用
+   */
+  getByTag(tag, limit = 20) {
+    const data = this.getAll();
+    const results = data.data.filter(item =>
+      item.tags && Array.isArray(item.tags) && item.tags.includes(tag)
+    );
+    return results.slice(0, limit);
+  }
+
+  /**
+   * 获取带统计的标签列表
+   */
+  getTagsWithCount() {
+    const data = this.getAll();
+    const tagCount = {};
+    data.data.forEach(item => {
+      if (item.tags && Array.isArray(item.tags)) {
+        item.tags.forEach(tag => {
+          tagCount[tag] = (tagCount[tag] || 0) + 1;
+        });
+      }
+    });
+    return Object.entries(tagCount)
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => b.count - a.count);
   }
 }
 
@@ -368,6 +424,11 @@ class InteractionStorage {
       liked: index === -1,
       count: data.likes.filter(l => l.appId === appId).length
     };
+  }
+
+  isLiked(appId) {
+    const data = this.getAll();
+    return data.likes.some(l => l.appId === appId);
   }
 
   getLikesCount(appId) {

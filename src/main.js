@@ -57,6 +57,11 @@ class Page {
 class HomePage extends Page {
   constructor() {
     super({ title: '首页' });
+    this.filters = {
+      keyword: '',
+      type: 'all',
+      tags: []
+    };
   }
 
   renderContent() {
@@ -67,7 +72,23 @@ class HomePage extends Page {
       </div>
       <div class="container">
         <section class="section">
-          <h2>🔥 热门应用</h2>
+          <div class="filter-bar">
+            <h2>🔥 热门应用</h2>
+            <div class="filter-controls">
+              <div class="search-box">
+                <input type="text" id="search-keyword" placeholder="搜索应用..." class="form-input">
+              </div>
+              <select id="filter-type" class="form-input filter-select">
+                <option value="all">全部分类</option>
+                <option value="tool">🛠️ 工具</option>
+                <option value="game">🎮 游戏</option>
+                <option value="utility">📝 效率</option>
+                <option value="other">📦 其他</option>
+              </select>
+              <button id="clear-filters" class="btn btn-outline">清除筛选</button>
+            </div>
+          </div>
+          <div id="filter-tags" class="filter-tags"></div>
           <div id="hot-apps" class="app-grid"></div>
         </section>
         <section class="section">
@@ -81,15 +102,110 @@ class HomePage extends Page {
   afterRender() {
     super.afterRender();
     this.loadApps();
+    this.bindFilterEvents();
   }
 
   async loadApps() {
     const { appStorage } = await import('../services/storage.js');
-    const hotApps = appStorage.getHotApps(6);
+    
+    // 根据筛选条件获取数据
+    let apps = [];
+    
+    // 如果有筛选条件，使用搜索方法
+    if (this.filters.keyword || this.filters.type !== 'all' || this.filters.tags.length > 0) {
+      apps = appStorage.search(this.filters);
+    } else {
+      apps = appStorage.getHotApps(12);
+    }
+
+    const hotApps = apps.slice(0, 6);
     const recentApps = appStorage.getRecentApps(6);
 
     document.getElementById('hot-apps').innerHTML = this.renderAppCards(hotApps);
     document.getElementById('recent-apps').innerHTML = this.renderAppCards(recentApps);
+    
+    // 如果有筛选结果但热门为空，显示提示
+    if (apps.length === 0) {
+      document.getElementById('hot-apps').innerHTML = '<div class="empty-state"><p>没有找到符合条件的应用</p></div>';
+    }
+  }
+
+  bindFilterEvents() {
+    const searchInput = document.getElementById('search-keyword');
+    const typeSelect = document.getElementById('filter-type');
+    const clearBtn = document.getElementById('clear-filters');
+
+    // 搜索防抖
+    let searchTimeout;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        this.filters.keyword = e.target.value.trim();
+        this.loadApps();
+      }, 300);
+    });
+
+    // 类型筛选
+    typeSelect.addEventListener('change', (e) => {
+      this.filters.type = e.target.value;
+      this.loadApps();
+    });
+
+    // 清除筛选
+    clearBtn.addEventListener('click', () => {
+      this.filters = { keyword: '', type: 'all', tags: [] };
+      searchInput.value = '';
+      typeSelect.value = 'all';
+      this.clearTagSelection();
+      this.loadApps();
+    });
+
+    // 加载标签
+    this.loadTags();
+  }
+
+  async loadTags() {
+    const { appStorage } = await import('../services/storage.js');
+    const tagsWithCount = appStorage.getTagsWithCount();
+    const container = document.getElementById('filter-tags');
+    
+    if (tagsWithCount.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+
+    container.style.display = 'flex';
+    container.innerHTML = tagsWithCount.map(({ tag, count }) => `
+      <button class="filter-tag" data-tag="${tag}">
+        ${tag} <span class="tag-count">${count}</span>
+      </button>
+    `).join('');
+
+    // 绑定标签点击事件
+    container.querySelectorAll('.filter-tag').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tag = btn.dataset.tag;
+        this.toggleTag(tag, btn);
+      });
+    });
+  }
+
+  toggleTag(tag, btn) {
+    const index = this.filters.tags.indexOf(tag);
+    if (index === -1) {
+      this.filters.tags.push(tag);
+      btn.classList.add('active');
+    } else {
+      this.filters.tags.splice(index, 1);
+      btn.classList.remove('active');
+    }
+    this.loadApps();
+  }
+
+  clearTagSelection() {
+    document.querySelectorAll('.filter-tag').forEach(btn => {
+      btn.classList.remove('active');
+    });
   }
 
   renderAppCards(apps) {
@@ -102,6 +218,9 @@ class HomePage extends Page {
         <div class="app-info">
           <h3>${escapeHtml(app.name)}</h3>
           <p>${escapeHtml(app.description || '')}</p>
+          <div class="app-tags-small">
+            ${this.renderAppTags(app.tags)}
+          </div>
           <div class="app-meta">
             <span>${getTypeName(app.type)}</span>
             <span>👁️ ${app.views || 0}</span>
@@ -109,6 +228,11 @@ class HomePage extends Page {
         </div>
       </div>
     `).join('');
+  }
+
+  renderAppTags(tags) {
+    if (!tags || !Array.isArray(tags) || tags.length === 0) return '';
+    return tags.slice(0, 3).map(tag => `<span class="tag-small">${tag}</span>`).join('');
   }
 }
 
@@ -134,7 +258,7 @@ class AppDetailPage extends Page {
   }
 
   async loadApp() {
-    const { appStorage, interactionStorage } = await import('../services/storage.js');
+    const { appStorage, interactionStorage, userStorage } = await import('../services/storage.js');
     const params = new URLSearchParams(window.location.search);
     const appId = params.get('id');
 
@@ -154,8 +278,9 @@ class AppDetailPage extends Page {
     interactionStorage.recordView(null, appId);
 
     const user = userStorage.getCurrentUser();
-    const isLiked = true; // 可以添加更多逻辑
+    const isLiked = interactionStorage.isLiked(appId);
     const likesCount = interactionStorage.getLikesCount(appId);
+    const isFavorited = user ? interactionStorage.isFavorited(user.id, appId) : false;
 
     document.getElementById('app-detail').innerHTML = `
       <div class="app-header">
@@ -164,11 +289,20 @@ class AppDetailPage extends Page {
           <h1>${escapeHtml(app.name)}</h1>
           <p class="app-description">${escapeHtml(app.description)}</p>
           <div class="app-tags">
-            <span class="tag">${getTypeName(app.type)}</span>
+            <span class="tag primary">${getTypeName(app.type)}</span>
+            ${this.renderTags(app.tags)}
+          </div>
+          <div class="app-actions">
+            <button id="favorite-btn" class="btn ${isFavorited ? 'btn-primary' : 'btn-outline'}">
+              ${isFavorited ? '⭐ 已收藏' : '☆ 收藏'}
+            </button>
+            <button id="like-btn" class="btn ${isLiked ? 'btn-primary' : 'btn-outline'}">
+              ${isLiked ? '❤️ 已赞' : '🤍 点赞'} <span id="likes-count">(${likesCount})</span>
+            </button>
           </div>
           <div class="app-stats">
             <span>👁️ ${app.views || 0}</span>
-            <span>❤️ ${likesCount}</span>
+            <span>📅 ${formatDate(app.createdAt)}</span>
           </div>
         </div>
       </div>
@@ -177,6 +311,48 @@ class AppDetailPage extends Page {
         <pre><code>${escapeHtml(app.code || '')}</code></pre>
       </div>
     `;
+
+    // 绑定按钮事件
+    this.bindActionEvents(appId, user);
+  }
+
+  renderTags(tags) {
+    if (!tags || !Array.isArray(tags) || tags.length === 0) return '';
+    return tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+  }
+
+  bindActionEvents(appId, user) {
+    const favoriteBtn = document.getElementById('favorite-btn');
+    const likeBtn = document.getElementById('like-btn');
+
+    // 收藏按钮
+    favoriteBtn.addEventListener('click', async () => {
+      if (!user) {
+        alert('请先登录后再收藏');
+        location.href = 'login.html';
+        return;
+      }
+
+      const { interactionStorage } = await import('../services/storage.js');
+      const result = interactionStorage.toggleFavorite(user.id, appId);
+      
+      if (result.success) {
+        favoriteBtn.className = result.favorited ? 'btn btn-primary' : 'btn btn-outline';
+        favoriteBtn.innerHTML = result.favorited ? '⭐ 已收藏' : '☆ 收藏';
+      }
+    });
+
+    // 点赞按钮
+    likeBtn.addEventListener('click', async () => {
+      const { interactionStorage } = await import('../services/storage.js');
+      const result = interactionStorage.toggleLike(appId);
+      
+      if (result.success) {
+        likeBtn.className = result.liked ? 'btn btn-primary' : 'btn btn-outline';
+        likeBtn.innerHTML = result.liked ? '❤️ 已赞' : '🤍 点赞';
+        document.getElementById('likes-count').textContent = `(${result.count})`;
+      }
+    });
   }
 }
 
@@ -212,6 +388,11 @@ class CreatePage extends Page {
               <textarea id="app-description" class="form-input" required maxlength="200" rows="3"></textarea>
             </div>
             <div class="form-group">
+              <label class="form-label">应用标签</label>
+              <input type="text" id="app-tags" class="form-input" placeholder="多个标签用逗号分隔，如：工具,实用,简单">
+              <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">多个标签请用逗号分隔</small>
+            </div>
+            <div class="form-group">
               <label class="form-label">应用代码</label>
               <textarea id="app-code" class="form-input" rows="10" placeholder="输入应用代码..."></textarea>
             </div>
@@ -239,11 +420,18 @@ class CreatePage extends Page {
       return;
     }
 
+    // 处理标签输入
+    const tagsInput = document.getElementById('app-tags').value.trim();
+    const tags = tagsInput 
+      ? tagsInput.split(',').map(t => t.trim()).filter(t => t.length > 0)
+      : [];
+
     const app = {
       name: document.getElementById('app-name').value.trim(),
       type: document.getElementById('app-type').value,
       description: document.getElementById('app-description').value.trim(),
       code: document.getElementById('app-code').value,
+      tags: tags,
       authorId: user.id,
       authorName: user.username
     };
